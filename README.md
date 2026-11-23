@@ -49,5 +49,11 @@ docker build -t kali-linux-headless .
 - Editing only the `Dockerfile` does not trigger a rebuild — the skip check
   hashes the upstream base image only. After such a change, run the workflow
   manually with `force` ticked.
+- **nmap capabilities:** Kali's `nmap` binary ships with file capabilities
+  including `cap_net_admin`, which Docker's default set does not grant, so a
+  plain `docker run` would fail with `nmap: Operation not permitted`. The
+  Dockerfile removes those file caps (`setcap -r`); the container runs as root,
+  which already has `cap_net_raw`, so nmap and raw scans (`-sS`) work. If you
+  need `cap_net_admin` features, add `--cap-add=NET_ADMIN` at run time.
 - `kali-rolling` is a rolling release, so "a new version" means the base image
   digest changed, not a numbered release.
